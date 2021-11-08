@@ -1,0 +1,14 @@
+[package]
+name = "rcfw"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+cortex-m = "0.6.2"
+cortex-m-rt = "0.6.12"
+nb = "1.0.0"
+embedded-hal = { version = "0.2.3", features = ["unproven"] }
+nrf52840-hal = { version = "0.13.0", features = ["rt"] }
+
+[features]
+52840 = []
