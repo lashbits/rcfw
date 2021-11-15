@@ -4,12 +4,25 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+nb = "1.0.0"
 cortex-m = "0.6.2"
 cortex-m-rt = "0.6.12"
+
 rtt-target = { version = "0.3.1", features = ["cortex-m"] }
-nb = "1.0.0"
+defmt = { version = "0.2.0", features = ["alloc"] }
+
 embedded-hal = { version = "0.2.3", features = ["unproven"] }
 nrf52840-hal = { version = "0.13.0", features = ["rt"] }
+
+nrf-softdevice = { git = "https://github.com/lashbits/nrf-softdevice", features = ["defmt", "defmt-trace", "nrf52840", "s140", "ble-peripheral", "ble-central", "critical-section-impl"] }
+nrf-softdevice-s122 = { git = "https://github.com/lashbits/nrf-softdevice" }
+nrf-softdevice-defmt-rtt = { git = "https://github.com/lashbits/nrf-softdevice" }
+
+panic-probe = { version = "0.2.0", features= ["print-defmt"] }
+futures = { version = "0.3.5", default-features = false }
+fixed = "1.2.0"
+heapless = "0.7.1"
+alloc-cortex-m = "0.4.0"
 
 [features]
 52840 = []
