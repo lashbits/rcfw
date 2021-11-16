@@ -8,8 +8,8 @@ rustflags = [
     # See https://github.com/rust-embedded/cortex-m-quickstart/pull/95
     "-C", "link-arg=--nmagic",
 
-    # LLD (shipped with the Rust toolchain) is used as the default linker
     "-C", "link-arg=-Tlink.x",
+    "-C", "link-arg=-Tdefmt.x",
 
     # Linker optimizations
     "-C", "inline-threshold=5",

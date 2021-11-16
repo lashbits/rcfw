@@ -8,7 +8,6 @@ nb = "1.0.0"
 cortex-m = "0.6.2"
 cortex-m-rt = "0.6.12"
 
-rtt-target = { version = "0.3.1", features = ["cortex-m"] }
 defmt = { version = "0.2.0", features = ["alloc"] }
 
 embedded-hal = { version = "0.2.3", features = ["unproven"] }
@@ -25,4 +24,14 @@ heapless = "0.7.1"
 alloc-cortex-m = "0.4.0"
 
 [features]
+default = [
+    "defmt-default",
+    "52840",
+]
 52840 = []
+defmt-default = []
+defmt-trace = []
+defmt-debug = []
+defmt-info = []
+defmt-warn = []
+defmt-error = []
