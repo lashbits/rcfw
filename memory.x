@@ -6,5 +6,5 @@ MEMORY
      *  256K ram starting at address 0x20000000
      */
     FLASH : ORIGIN = 0x00027000, LENGTH = 1000K - 0x2700
-    RAM : ORIGIN = 0x20020000, LENGTH = 128K
+    RAM : ORIGIN = 0x2000d488, LENGTH = 256K - 0xd488
 }

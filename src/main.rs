@@ -3,7 +3,9 @@
 #![feature(alloc_error_handler)]
 
 use nrf52840_hal as hal;
-use nrf_softdevice_defmt_rtt as _; // global logger
+
+//use defmt_rtt as _;
+use nrf_softdevice_defmt_rtt as _;
 
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
@@ -20,6 +22,8 @@ static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
+    defmt::info!("Hello, world!");
+
     let config = nrf_softdevice::Config {
         clock: Some(raw::nrf_clock_lf_cfg_t {
             source: raw::NRF_CLOCK_LF_SRC_RC as u8,
