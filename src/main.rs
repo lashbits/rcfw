@@ -4,19 +4,17 @@
 
 use nrf52840_hal as hal;
 
-//use defmt_rtt as _;
-use nrf_softdevice_defmt_rtt as _;
+use defmt_rtt as _;
 
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::slice;
 use defmt::panic;
 use nrf_softdevice::ble::central;
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
-// this is the allocator the application will use
 #[global_allocator]
 static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
