@@ -2,69 +2,69 @@
 #![no_main]
 #![feature(alloc_error_handler)]
 
-use nrf52840_hal as hal;
+mod softdevice;
+mod util;
 
 use defmt_rtt as _;
+use nrf52840_hal as hal;
 
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
 use core::mem;
-use core::slice;
 use defmt::panic;
-use nrf_softdevice::ble::central;
-use nrf_softdevice::raw;
-use nrf_softdevice::Softdevice;
+use softdevice as sd;
 
 #[global_allocator]
 static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
-    defmt::info!("Hello, world!");
+    sd::enable(sd::bindgen::nrf_clock_lf_cfg_t {
+        source: sd::bindgen::NRF_CLOCK_LF_SRC_RC as u8,
+        rc_ctiv: 4,
+        rc_temp_ctiv: 2,
+        accuracy: 7,
+    });
 
-    let config = nrf_softdevice::Config {
-        clock: Some(raw::nrf_clock_lf_cfg_t {
-            source: raw::NRF_CLOCK_LF_SRC_RC as u8,
-            rc_ctiv: 4,
-            rc_temp_ctiv: 2,
-            accuracy: 7,
-        }),
-        conn_gap: Some(raw::ble_gap_conn_cfg_t {
-            conn_count: 6,
-            event_length: 6,
-        }),
-        conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 128 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
-            attr_tab_size: 32768,
-        }),
-        gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
-            adv_set_count: 1,
-            periph_role_count: 3,
-            central_role_count: 3,
-            central_sec_count: 0,
-            _bitfield_1: raw::ble_gap_cfg_role_count_t::new_bitfield_1(0),
-        }),
-        gap_device_name: Some(raw::ble_gap_cfg_device_name_t {
-            p_value: b"HelloRust" as *const u8 as _,
-            current_len: 9,
-            max_len: 9,
-            write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
-        }),
-        ..Default::default()
-    };
+    sd::ble_conn_cfgs::gap(sd::bindgen::ble_gap_conn_cfg_t {
+        conn_count: 6,
+        event_length: 6,
+    });
+    sd::ble_conn_cfgs::gatt(sd::bindgen::ble_gatt_conn_cfg_t { att_mtu: 128 });
 
-    Softdevice::enable(&config);
+    sd::ble_gap_cfgs::role_count(sd::bindgen::ble_gap_cfg_role_count_t {
+        adv_set_count: 1,
+        periph_role_count: 3,
+        central_role_count: 3,
+        central_sec_count: 0,
+        _bitfield_1: sd::bindgen::ble_gap_cfg_role_count_t::new_bitfield_1(0),
+    });
+    sd::ble_gap_cfgs::device_name(sd::bindgen::ble_gap_cfg_device_name_t {
+        p_value: b"HelloRust" as *const u8 as _,
+        current_len: 9,
+        max_len: 9,
+        write_perm: unsafe { mem::zeroed() },
+        _bitfield_1: sd::bindgen::ble_gap_cfg_device_name_t::new_bitfield_1(
+            sd::bindgen::BLE_GATTS_VLOC_STACK as u8,
+        ),
+    });
 
+    sd::ble_gatts_cfgs::attr_tab_size(sd::bindgen::ble_gatts_cfg_attr_tab_size_t {
+        attr_tab_size: 32768,
+    });
+
+    let mut wanted_app_ram_base = sd::app_ram_base();
+    sd::ble_enable(&mut wanted_app_ram_base);
+    defmt::info!("wanted app ram base is {:x}", wanted_app_ram_base);
+
+    defmt::info!("Going into the infinite loop...");
     loop {
-        cortex_m::asm::wfi();
+        //cortex_m::asm::wfi();
     }
 }
 
 #[panic_handler]
-fn panic(_: &core::panic::PanicInfo) -> ! {
+fn panic_handler(_: &core::panic::PanicInfo) -> ! {
     loop {
         cortex_m::asm::bkpt();
     }
