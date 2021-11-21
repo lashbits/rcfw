@@ -1,6 +1,6 @@
 use crate::softdevice::{self as sd, bindgen};
 
-pub fn gap(cfg: bindgen::ble_gap_conn_cfg_t) -> Result<(), ()> {
+pub fn gap(cfg: bindgen::ble_gap_conn_cfg_t) {
     sd::ble_cfg_set(
         bindgen::BLE_CONN_CFGS_BLE_CONN_CFG_GAP,
         bindgen::ble_cfg_t {
@@ -9,10 +9,10 @@ pub fn gap(cfg: bindgen::ble_gap_conn_cfg_t) -> Result<(), ()> {
                 params: bindgen::ble_conn_cfg_t__bindgen_ty_1 { gap_conn_cfg: cfg },
             },
         },
-    )
+    );
 }
 
-pub fn gatt(cfg: bindgen::ble_gatt_conn_cfg_t) -> Result<(), ()> {
+pub fn gatt(cfg: bindgen::ble_gatt_conn_cfg_t) {
     sd::ble_cfg_set(
         bindgen::BLE_CONN_CFGS_BLE_CONN_CFG_GATT,
         bindgen::ble_cfg_t {
@@ -21,5 +21,5 @@ pub fn gatt(cfg: bindgen::ble_gatt_conn_cfg_t) -> Result<(), ()> {
                 params: bindgen::ble_conn_cfg_t__bindgen_ty_1 { gatt_conn_cfg: cfg },
             },
         },
-    )
+    );
 }

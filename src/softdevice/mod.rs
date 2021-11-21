@@ -39,7 +39,7 @@ unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     }
 }
 
-pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) -> Result<(), ()> {
+pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) {
     let rv: u32;
     unsafe {
         rv = bindgen::sd_softdevice_enable(
@@ -53,36 +53,27 @@ pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) -> Result<(), ()> {
     match rv {
         bindgen::NRF_SUCCESS => {
             defmt::info!("softdevice succesfully enabled");
-            Ok(())
         }
         bindgen::NRF_ERROR_INVALID_ADDR => {
-            defmt::error!("invalid or NULL pointer supplied");
-            Err(())
+            panic!("invalid or NULL pointer supplied");
         }
         bindgen::NRF_ERROR_INVALID_STATE => {
-            defmt::error!("softdevice already enabled");
-            Err(())
+            panic!("softdevice already enabled");
         }
         bindgen::NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION => {
-            defmt::error!("softdevice interrupt is already enabled, or an enabled interrupt has an illegal priority level");
-            Err(())
+            panic!("softdevice interrupt is already enabled, or an enabled interrupt has an illegal priority level");
         }
         bindgen::NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN => {
-            defmt::error!("unknown low frequency clock source selected");
-            Err(())
+            panic!("unknown low frequency clock source selected");
         }
         bindgen::NRF_ERROR_INVALID_PARAM => {
-            defmt::error!("invalid clock source configuration supplied in p_clock_lf_cfg");
-            Err(())
+            panic!("invalid clock source configuration supplied in p_clock_lf_cfg")
         }
-        _ => {
-            defmt::error!("unknown error occured");
-            Err(())
-        }
-    }
+        _ => panic!("unknown error occured"),
+    };
 }
 
-pub fn ble_enable(app_ram_base: &mut u32) -> Result<(), ()> {
+pub fn ble_enable(app_ram_base: &mut u32) {
     let rv: u32;
     unsafe {
         rv = bindgen::sd_ble_enable(app_ram_base as *mut u32);
@@ -93,29 +84,21 @@ pub fn ble_enable(app_ram_base: &mut u32) -> Result<(), ()> {
     match rv {
         bindgen::NRF_SUCCESS => {
             defmt::info!("softdevice bluetooth stack succesfully enabled");
-            Ok(())
         }
         bindgen::NRF_ERROR_INVALID_STATE => {
-            defmt::error!("ble stack already initialized");
-            Err(())
+            panic!("ble stack already initialized");
         }
         bindgen::NRF_ERROR_INVALID_ADDR => {
-            defmt::error!("invalid or not sufficiently aligned pointer supplied");
-            Err(())
+            panic!("invalid or not sufficiently aligned pointer supplied");
         }
         bindgen::NRF_ERROR_NO_MEM => {
-            defmt::error!("not enough memory");
-            Err(())
+            panic!("not enough memory");
         }
         bindgen::NRF_ERROR_RESOURCES => {
-            defmt::error!("total number of L2CAP channels configured is too large");
-            Err(())
+            panic!("total number of L2CAP channels configured is too large");
         }
-        _ => {
-            defmt::error!("unknown error occured");
-            Err(())
-        }
-    }
+        _ => panic!("unknown error occured"),
+    };
 }
 
 /// Apply a configuration to the softdevice.
@@ -146,30 +129,24 @@ pub fn ble_enable(app_ram_base: &mut u32) -> Result<(), ()> {
 ///     ble_gatts_conn_cfg_t    gatts_conn_cfg  (for BLE_CONN_CFG_GATTS)
 ///     ble_gatt_conn_cfg_t     gatt_conn_cfg   (for BLE_CONN_CFG_GATT)
 ///     ble_l2cap_conn_cfg_t    l2cap_conn_cfg  (for BLE_CONN_CFG_L2CAP)
-pub fn ble_cfg_set(cfg_id: u32, cfg: bindgen::ble_cfg_t) -> Result<(), ()> {
+pub fn ble_cfg_set(cfg_id: u32, cfg: bindgen::ble_cfg_t) {
     let rv: u32;
     unsafe {
         rv = bindgen::sd_ble_cfg_set(cfg_id, &cfg as *const bindgen::ble_cfg_t, app_ram_base());
     }
 
     match rv {
-        bindgen::NRF_SUCCESS => Ok(()),
+        bindgen::NRF_SUCCESS => {}
         bindgen::NRF_ERROR_INVALID_STATE => {
-            defmt::error!("BLE stack had already been initialized");
-            Err(())
+            panic!("BLE stack had already been initialized");
         }
         bindgen::NRF_ERROR_INVALID_ADDR => {
-            defmt::error!("invalid or not sufficiently aligned pointer supplied");
-            Err(())
+            panic!("invalid or not sufficiently aligned pointer supplied");
         }
         bindgen::NRF_ERROR_INVALID_PARAM => {
-            defmt::error!("invalid cfg_id supplied");
-            Err(())
+            panic!("invalid cfg_id supplied");
         }
-        bindgen::NRF_ERROR_NO_MEM => Err(()),
-        _ => {
-            defmt::error!("unknown error occured");
-            Err(())
-        }
-    }
+        bindgen::NRF_ERROR_NO_MEM => panic!("not enough memory"),
+        _ => panic!("unknown error occured"),
+    };
 }

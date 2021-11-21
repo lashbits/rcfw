@@ -1,6 +1,6 @@
 use crate::softdevice::{self as sd, bindgen};
 
-pub fn role_count(cfg: bindgen::ble_gap_cfg_role_count_t) -> Result<(), ()> {
+pub fn role_count(cfg: bindgen::ble_gap_cfg_role_count_t) {
     sd::ble_cfg_set(
         bindgen::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT,
         bindgen::ble_cfg_t {
@@ -8,10 +8,10 @@ pub fn role_count(cfg: bindgen::ble_gap_cfg_role_count_t) -> Result<(), ()> {
                 role_count_cfg: cfg,
             },
         },
-    )
+    );
 }
 
-pub fn device_name(cfg: bindgen::ble_gap_cfg_device_name_t) -> Result<(), ()> {
+pub fn device_name(cfg: bindgen::ble_gap_cfg_device_name_t) {
     sd::ble_cfg_set(
         bindgen::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME,
         bindgen::ble_cfg_t {
@@ -19,5 +19,5 @@ pub fn device_name(cfg: bindgen::ble_gap_cfg_device_name_t) -> Result<(), ()> {
                 device_name_cfg: cfg,
             },
         },
-    )
+    );
 }
