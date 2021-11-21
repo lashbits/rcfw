@@ -3,7 +3,6 @@
 #![feature(alloc_error_handler)]
 
 mod softdevice;
-mod util;
 
 use defmt_rtt as _;
 use nrf52840_hal as hal;

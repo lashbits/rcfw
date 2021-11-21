@@ -1,6 +1,10 @@
 pub use nrf_softdevice_s140 as bindgen;
 
-const APP_CONN_CFG_TAG: u8 = 1;
+pub mod ble_conn_cfgs;
+pub mod ble_gap_cfgs;
+pub mod ble_gatts_cfgs;
+
+pub const APP_CONN_CFG_TAG: u8 = 1;
 
 pub fn app_ram_base() -> u32 {
     unsafe {
@@ -167,75 +171,5 @@ pub fn ble_cfg_set(cfg_id: u32, cfg: bindgen::ble_cfg_t) -> Result<(), ()> {
             defmt::error!("unknown error occured");
             Err(())
         }
-    }
-}
-
-pub mod ble_conn_cfgs {
-    use crate::softdevice as sd;
-    use nrf_softdevice_s140 as bindgen;
-
-    pub fn gap(cfg: bindgen::ble_gap_conn_cfg_t) -> Result<(), ()> {
-        sd::ble_cfg_set(
-            bindgen::BLE_CONN_CFGS_BLE_CONN_CFG_GAP,
-            bindgen::ble_cfg_t {
-                conn_cfg: bindgen::ble_conn_cfg_t {
-                    conn_cfg_tag: sd::APP_CONN_CFG_TAG,
-                    params: bindgen::ble_conn_cfg_t__bindgen_ty_1 { gap_conn_cfg: cfg },
-                },
-            },
-        )
-    }
-
-    pub fn gatt(cfg: bindgen::ble_gatt_conn_cfg_t) -> Result<(), ()> {
-        sd::ble_cfg_set(
-            bindgen::BLE_CONN_CFGS_BLE_CONN_CFG_GATT,
-            bindgen::ble_cfg_t {
-                conn_cfg: bindgen::ble_conn_cfg_t {
-                    conn_cfg_tag: sd::APP_CONN_CFG_TAG,
-                    params: bindgen::ble_conn_cfg_t__bindgen_ty_1 { gatt_conn_cfg: cfg },
-                },
-            },
-        )
-    }
-}
-
-pub mod ble_gap_cfgs {
-    use crate::softdevice as sd;
-    use nrf_softdevice_s140 as bindgen;
-
-    pub fn role_count(cfg: bindgen::ble_gap_cfg_role_count_t) -> Result<(), ()> {
-        sd::ble_cfg_set(
-            bindgen::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT,
-            bindgen::ble_cfg_t {
-                gap_cfg: bindgen::ble_gap_cfg_t {
-                    role_count_cfg: cfg,
-                },
-            },
-        )
-    }
-
-    pub fn device_name(cfg: bindgen::ble_gap_cfg_device_name_t) -> Result<(), ()> {
-        sd::ble_cfg_set(
-            bindgen::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME,
-            bindgen::ble_cfg_t {
-                gap_cfg: bindgen::ble_gap_cfg_t {
-                    device_name_cfg: cfg,
-                },
-            },
-        )
-    }
-}
-
-pub mod ble_gatts_cfgs {
-    use crate::softdevice as sd;
-    use nrf_softdevice_s140 as bindgen;
-
-    pub fn attr_tab_size(cfg: bindgen::ble_gatts_cfg_attr_tab_size_t) -> Result<(), ()> {
-        sd::ble_cfg_set(
-            bindgen::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE,
-            bindgen::ble_cfg_t {
-                gatts_cfg: bindgen::ble_gatts_cfg_t { attr_tab_size: cfg },
-            },
-        )
     }
 }
