@@ -4,6 +4,8 @@ pub mod ble_conn_cfgs;
 pub mod ble_gap_cfgs;
 pub mod ble_gatts_cfgs;
 
+use defmt::panic;
+
 pub const APP_CONN_CFG_TAG: u8 = 1;
 
 pub fn app_ram_base() -> u32 {
