@@ -1,10 +1,11 @@
+#[cfg(feature = "s140")]
 pub use nrf_softdevice_s140 as bindgen;
 
 pub mod ble_conn_cfgs;
 pub mod ble_gap_cfgs;
 pub mod ble_gatts_cfgs;
 
-use defmt::panic;
+use defmt::{panic, *};
 
 pub const APP_CONN_CFG_TAG: u8 = 1;
 
@@ -43,6 +44,9 @@ unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
 
 pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) {
     let rv: u32;
+
+    info!("enabling the softdevice");
+
     unsafe {
         rv = bindgen::sd_softdevice_enable(
             &clock_lf_cfg as *const bindgen::nrf_clock_lf_cfg_t,
@@ -50,11 +54,9 @@ pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) {
         );
     }
 
-    defmt::info!("enabling the softdevice");
-
     match rv {
         bindgen::NRF_SUCCESS => {
-            defmt::info!("softdevice succesfully enabled");
+            info!("softdevice succesfully enabled");
         }
         bindgen::NRF_ERROR_INVALID_ADDR => {
             panic!("invalid or NULL pointer supplied");
@@ -77,27 +79,22 @@ pub fn enable(clock_lf_cfg: bindgen::nrf_clock_lf_cfg_t) {
 
 pub fn ble_enable(app_ram_base: &mut u32) {
     let rv: u32;
+
+    info!("enabling the softdevice bluetooth stack");
+
     unsafe {
         rv = bindgen::sd_ble_enable(app_ram_base as *mut u32);
     }
 
-    defmt::info!("enabling the softdevice bluetooth stack");
-
     match rv {
-        bindgen::NRF_SUCCESS => {
-            defmt::info!("softdevice bluetooth stack succesfully enabled");
-        }
-        bindgen::NRF_ERROR_INVALID_STATE => {
-            panic!("ble stack already initialized");
-        }
+        bindgen::NRF_SUCCESS => info!("softdevice bluetooth stack succesfully enabled"),
+        bindgen::NRF_ERROR_INVALID_STATE => panic!("ble stack already initialized"),
         bindgen::NRF_ERROR_INVALID_ADDR => {
-            panic!("invalid or not sufficiently aligned pointer supplied");
+            panic!("invalid or not sufficiently aligned pointer supplied")
         }
-        bindgen::NRF_ERROR_NO_MEM => {
-            panic!("not enough memory");
-        }
+        bindgen::NRF_ERROR_NO_MEM => panic!("not enough memory"),
         bindgen::NRF_ERROR_RESOURCES => {
-            panic!("total number of L2CAP channels configured is too large");
+            panic!("total number of L2CAP channels configured is too large")
         }
         _ => panic!("unknown error occured"),
     };
@@ -139,16 +136,77 @@ pub fn ble_cfg_set(cfg_id: u32, cfg: bindgen::ble_cfg_t) {
 
     match rv {
         bindgen::NRF_SUCCESS => {}
-        bindgen::NRF_ERROR_INVALID_STATE => {
-            panic!("BLE stack had already been initialized");
-        }
+        bindgen::NRF_ERROR_INVALID_STATE => panic!("BLE stack had already been initialized"),
         bindgen::NRF_ERROR_INVALID_ADDR => {
-            panic!("invalid or not sufficiently aligned pointer supplied");
+            panic!("invalid or not sufficiently aligned pointer supplied")
         }
-        bindgen::NRF_ERROR_INVALID_PARAM => {
-            panic!("invalid cfg_id supplied");
-        }
+        bindgen::NRF_ERROR_INVALID_PARAM => panic!("invalid cfg_id supplied"),
         bindgen::NRF_ERROR_NO_MEM => panic!("not enough memory"),
         _ => panic!("unknown error occured"),
     };
+}
+
+pub fn ble_gap_tx_power_set(role: u8, handle: u16, tx_power: i8) {
+    let rv: u32;
+
+    info!("setting the gap tx power");
+
+    unsafe {
+        rv = bindgen::sd_ble_gap_tx_power_set(role, handle, tx_power);
+    }
+
+    match rv {
+        bindgen::NRF_SUCCESS => info!("successfully set the tx power"),
+        bindgen::NRF_ERROR_INVALID_PARAM => panic!("invalid parameter(s) supplied"),
+        bindgen::BLE_ERROR_INVALID_ADV_HANDLE => panic!("advertising handle not found"),
+        bindgen::BLE_ERROR_INVALID_CONN_HANDLE => panic!("invalid connection handle supplied"),
+        _ => panic!("unknown error occured"),
+    }
+}
+
+pub fn ble_gap_scan_start(
+    scan_params: bindgen::ble_gap_scan_params_t,
+    adv_report_buffer: &mut [u8],
+) {
+    let rv: u32;
+
+    info!("starting to scanning for advertisements");
+
+    unsafe {
+        let ble_data = bindgen::ble_data_t {
+            p_data: adv_report_buffer.as_mut_ptr(),
+            len: adv_report_buffer.len() as _,
+        };
+        rv = bindgen::sd_ble_gap_scan_start(
+            &scan_params as *const bindgen::ble_gap_scan_params_t,
+            &ble_data as *const bindgen::ble_data_t,
+        );
+    }
+
+    match rv {
+        bindgen::NRF_SUCCESS => info!("started scanning for advertisements"),
+        bindgen::NRF_ERROR_INVALID_ADDR => panic!("invalid pointer supplied"),
+        bindgen::NRF_ERROR_INVALID_STATE => panic!("invalid state to perform operation"),
+        bindgen::NRF_ERROR_INVALID_PARAM => panic!("invalid parameter(s) supplied"),
+        bindgen::NRF_ERROR_NOT_SUPPORTED => panic!("unsupported parameters supplied."),
+        bindgen::NRF_ERROR_INVALID_LENGTH => panic!("the provided buffer length is invalid"),
+        bindgen::NRF_ERROR_RESOURCES => panic!("not enough BLE role slots available"),
+        _ => panic!("unknown error occured"),
+    };
+}
+
+pub fn ble_gap_scan_stop() {
+    let rv: u32;
+
+    info!("stopping the scanning for advertisements");
+
+    unsafe {
+        rv = bindgen::sd_ble_gap_scan_stop();
+    }
+
+    match rv {
+        bindgen::NRF_SUCCESS => info!("successfully stopped scanning"),
+        bindgen::NRF_ERROR_INVALID_STATE => panic!("not in the scanning state"),
+        _ => panic!("unknown error occured"),
+    }
 }

@@ -1,8 +1,6 @@
-use defmt_rtt as _;
-
-use core::mem;
-
 use crate::softdevice as sd;
+use core::mem;
+use defmt_rtt as _;
 
 pub fn init() {
     sd::enable(sd::bindgen::nrf_clock_lf_cfg_t {
@@ -42,4 +40,26 @@ pub fn init() {
     let mut wanted_app_ram_base = sd::app_ram_base();
     sd::ble_enable(&mut wanted_app_ram_base);
     defmt::info!("wanted app ram base is {:x}", wanted_app_ram_base);
+}
+
+pub fn connect(address: [u8; 6]) {
+    sd::ble_gap_tx_power_set(
+        sd::bindgen::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
+        0,
+        0,
+    );
+
+    let mut buf = [0u8; sd::bindgen::BLE_GAP_SCAN_BUFFER_MAX as usize];
+    sd::ble_gap_scan_start(
+        sd::bindgen::ble_gap_scan_params_t {
+            _bitfield_1: sd::bindgen::ble_gap_cfg_role_count_t::new_bitfield_1(0),
+            scan_phys: sd::bindgen::BLE_GAP_PHY_1MBPS as _,
+            interval: 2732,
+            window: 500,
+            timeout: sd::bindgen::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _,
+            channel_mask: [0; 5],
+        },
+        &mut buf,
+    );
+    defer!(sd::ble_gap_scan_stop());
 }
