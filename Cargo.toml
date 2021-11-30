@@ -6,11 +6,12 @@ edition = "2018"
 [dependencies]
 alloc-cortex-m = "0.4.0"
 cortex-m = "0.6.2"
-cortex-m-rt = "0.6.12"
+cortex-m-rt = { version = "0.7.0", features = ["device"] }
+cortex-m-rtic = { version = "0.5.9", features = ["cortex-m-7"], default-features = false }
 defmt = { version = "0.3.0", features = ["alloc"] }
 defmt-rtt = "0.3.0"
 nb = "1.0.0"
-nrf52840-hal = { version = "0.13.0" }
+nrf52840-hal = "0.14.0"
 nrf-softdevice-s140 = { git = "https://github.com/lashbits/nrf-softdevice" }
 scopeguard = { version = "1.1.0", default-features = false }
 
