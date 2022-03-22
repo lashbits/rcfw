@@ -11,14 +11,31 @@ cortex-m-rtic = { version = "0.5.9", features = ["cortex-m-7"], default-features
 defmt = { version = "0.3.0", features = ["alloc"] }
 defmt-rtt = "0.3.0"
 nb = "1.0.0"
-nrf52840-hal = "0.14.0"
-nrf-softdevice-s140 = { git = "https://github.com/lashbits/nrf-softdevice" }
+nrf52840-hal = "0.15.0"
 scopeguard = { version = "1.1.0", default-features = false }
+nrf-softdevice = { git = "https://github.com/lashbits/nrf-softdevice", features = ["defmt", "nrf52840", "s140", "ble-peripheral", "ble-central"] }
+nrf-softdevice-s140 = { git = "https://github.com/lashbits/nrf-softdevice" }
+embassy = { version = "0.1.0", features = ["defmt"] }
+embassy-traits = { version = "0.1.0" }
+embassy-nrf = { version = "0.1.0", features = ["defmt", "nrf52840"] }
+futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
+
+[patch.crates-io]
+embassy = { git = "https://github.com/lashbits/embassy" }
+embassy-nrf = { git = "https://github.com/lashbits/embassy" }
+embassy-macros = { git = "https://github.com/lashbits/embassy" }
+embassy-traits = { git = "https://github.com/lashbits/embassy" }
 
 [features]
 default = [
     "52840",
     "s140",
+    "embassy-nrf/nightly",
+    "embassy-nrf/unstable-traits",
+    "nrf-softdevice/ble-l2cap",
+    "nrf-softdevice/ble-gatt-server",
+    "nrf-softdevice/ble-gatt-client",
+
 ]
 52840 = []
 s140 = []

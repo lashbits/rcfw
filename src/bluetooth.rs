@@ -2,14 +2,16 @@ use crate::softdevice as sd;
 use core::mem;
 use defmt_rtt as _;
 
-pub fn init() {
+pub fn enable() {
     sd::enable(sd::bindgen::nrf_clock_lf_cfg_t {
         source: sd::bindgen::NRF_CLOCK_LF_SRC_RC as u8,
         rc_ctiv: 4,
         rc_temp_ctiv: 2,
         accuracy: 7,
     });
+}
 
+pub fn init() {
     sd::ble_conn_cfgs::gap(sd::bindgen::ble_gap_conn_cfg_t {
         conn_count: 6,
         event_length: 6,
